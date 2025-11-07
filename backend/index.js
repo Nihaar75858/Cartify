@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
       products: 'GET /api/products',
       cart: 'GET /api/cart',
       addToCart: 'POST /api/cart',
+      updateCart: 'PUT /api/cart/:id',
     }
   });
 });

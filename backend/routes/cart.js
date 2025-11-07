@@ -66,4 +66,39 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.put('/:id', async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    if (quantity < 1) {
+      return res.status(400).json({ error: 'Quantity must be at least 1' });
+    }
+
+    const cart = await Cart.findOne({ userId: 'mock-user-123' });
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+
+    const item = cart.items.id(req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found in cart' });
+    }
+
+    item.quantity = quantity;
+    await cart.save();
+    await cart.populate('items.product');
+
+    res.json({
+      message: 'Cart updated',
+      cart: {
+        items: cart.items,
+        total: cart.total
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update cart' });
+  }
+});
+
 module.exports = router;
