@@ -60,6 +60,35 @@ const Cartify = () => {
     }
   };
 
+  const updateQuantity = async (cartItemId, change) => {
+    console.log("cartItemId", cartItemId, change);
+    const item = cart.find((i) => i._id === cartItemId);
+    if (!item) {
+        alert('error ocuured here')
+      return;
+    }
+
+    const newQty = item.quantity + change;
+    if (newQty < 1) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/cart/${cartItemId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantity: newQty }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update quantity");
+
+      await fetchCart();
+    } catch (err) {
+      setError("Failed to update quantity");
+      console.error(err);
+    }
+  };
+
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -126,6 +155,84 @@ const Cartify = () => {
           </div>
         )}
       </main>
+
+      {/* Cart Sidebar */}
+      {showCart && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+          <div className="bg-white w-full max-w-md h-full overflow-y-auto shadow-xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
+              <button
+                onClick={() => setShowCart(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                Go back
+              </button>
+            </div>
+
+            {cart.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <p>Your cart is empty</p>
+              </div>
+            ) : (
+              <>
+                <div className="p-4 space-y-4">
+                  {cart.map((item) => (
+                    <div
+                      key={item._id}
+                      className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 truncate">
+                          {item.product.name}
+                        </h3>
+                        <p className="text-indigo-600 font-semibold">
+                          ${item.product.price.toFixed(2)}
+                        </p>
+
+                        <div className="flex items-center space-x-2 mt-2">
+                          <button
+                            onClick={() => updateQuantity(item._id, -1)}
+                            className="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center text-black font-semibold">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item._id, 1)}
+                            className="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-4">
+                  <div className="flex items-center justify-between text-xl font-bold">
+                    <span>Total:</span>
+                    <span className="text-indigo-600">
+                      ${cartTotal.toFixed(2)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowCart(false);
+                    }}
+                    className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                  >
+                    Proceed to Checkout
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
