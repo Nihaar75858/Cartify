@@ -30,6 +30,7 @@ app.get('/', (req, res) => {
       cart: 'GET /api/cart',
       addToCart: 'POST /api/cart',
       updateCart: 'PUT /api/cart/:id',
+      removeFromCart: 'DELETE /api/cart/:id',
     }
   });
 });

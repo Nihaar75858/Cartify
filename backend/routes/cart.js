@@ -74,7 +74,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Quantity must be at least 1' });
     }
 
-    const cart = await Cart.findOne({ userId: 'mock-user-123' });
+    const cart = await Cart.findOne({ userId: 'User-123' });
     if (!cart) {
       return res.status(404).json({ error: 'Cart not found' });
     }
@@ -98,6 +98,30 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to update cart' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ userId: 'User-123' });
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+
+    cart.items.pull(req.params.id);
+    await cart.save();
+    await cart.populate('items.product');
+
+    res.json({
+      message: 'Item removed from cart',
+      cart: {
+        items: cart.items,
+        total: cart.total
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to remove item from cart' });
   }
 });
 
