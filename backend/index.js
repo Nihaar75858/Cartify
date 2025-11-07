@@ -16,19 +16,19 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Cartify',
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('Connection error:', err));
 
-mongoose.connection.once('open', () => {
-  console.log('Connected to DB:', mongoose.connection.name);
-});
-
-
 const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/cart');
+
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Cartify API',
     endpoints: {
       products: 'GET /api/products',
+      cart: 'GET /api/cart',
+      addToCart: 'POST /api/cart',
     }
   });
 });
