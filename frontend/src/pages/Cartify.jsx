@@ -64,12 +64,13 @@ const Cartify = () => {
     console.log("cartItemId", cartItemId, change);
     const item = cart.find((i) => i._id === cartItemId);
     if (!item) {
-        alert('error ocuured here')
+      alert("error ocuured here");
       return;
     }
 
     const newQty = item.quantity + change;
     if (newQty < 1) {
+      removeFromCart(cartItemId);
       return;
     }
 
@@ -85,6 +86,21 @@ const Cartify = () => {
       await fetchCart();
     } catch (err) {
       setError("Failed to update quantity");
+      console.error(err);
+    }
+  };
+
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const response = await fetch(`${API_URL}/cart/${cartItemId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to remove item");
+
+      await fetchCart();
+    } catch (err) {
+      setError("Failed to remove item");
       console.error(err);
     }
   };
@@ -207,6 +223,18 @@ const Cartify = () => {
                             +
                           </button>
                         </div>
+                      </div>
+
+                      <div className="flex flex-col items-end space-y-2">
+                        <span className="font-bold text-gray-900">
+                          ${(item.product.price * item.quantity).toFixed(2)}
+                        </span>
+                        <button
+                          onClick={() => removeFromCart(item._id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   ))}
