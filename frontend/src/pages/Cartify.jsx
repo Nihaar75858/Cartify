@@ -9,6 +9,11 @@ const Cartify = () => {
   const [cart, setCart] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [showCart, setShowCart] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutForm, setCheckoutForm] = useState({
+    name: '',
+    email: ''
+  });
 
   // Fetch products from backend
   useEffect(() => {
@@ -105,24 +110,64 @@ const Cartify = () => {
     }
   };
 
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+
+    if (!checkoutForm.name || !checkoutForm.email) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (cart.length === 0) {
+      setError("Cart is empty");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartItems: cart,
+          customerInfo: checkoutForm,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Checkout failed");
+
+      const data = await response.json();
+      setShowCheckout(false);
+      setShowCart(false);
+      setCart([]);
+      setCartTotal(0);
+      setCheckoutForm({ name: "", email: "" });
+      setError("");
+    } catch (err) {
+      setError("Checkout failed. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center space-x-3">
+    <div className="min-h-screen bg-gray-300">
+      <header className="bg-red-500 shadow-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between space-x-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Cartify</h1>
-            <p className="text-sm text-gray-500">Your favorite online store</p>
+            <h1 className="text-2xl font-bold text-white">Cartify</h1>
           </div>
 
           <button
             onClick={() => setShowCart(true)}
-            className="relative px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
+            className="relative px-4 py-8 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
-            <span>Cart</span>
+            <p>Cart</p>
             {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-red-800 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                 {cartItemCount}
               </span>
             )}
@@ -130,9 +175,26 @@ const Cartify = () => {
         </div>
       </header>
 
+      <div className="max-w-7xl mx-auto px-20 py-20 flex items-center justify-between gap-10">
+        <div className="text-black flex-1 text-4xl">
+          <h1 className="mb-10">Cartify</h1>
+          <p className="text-xl text-gray-700">
+            Shop and get your favourite items.
+          </p>
+        </div>
+
+        <div className="flex-1">
+          <img
+            className="w-full h-auto object-cover"
+            src="/main_bg.png"
+            alt="bg"
+          />
+        </div>
+      </div>
+
       {/* Products Grid */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+      <main className="max-w-7xl mx-auto px-4 py-8 bg-red-500">
+        <h2 className="text-3xl font-bold text-white mb-6">
           Featured Products
         </h2>
 
@@ -250,6 +312,7 @@ const Cartify = () => {
                   <button
                     onClick={() => {
                       setShowCart(false);
+                      setShowCheckout(true);
                     }}
                     className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                   >
@@ -258,6 +321,89 @@ const Cartify = () => {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {showCheckout && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Checkout</h2>
+              <button
+                onClick={() => setShowCheckout(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                Go Back
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={checkoutForm.name}
+                  onChange={(e) =>
+                    setCheckoutForm({ ...checkoutForm, name: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-black"
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={checkoutForm.email}
+                  onChange={(e) =>
+                    setCheckoutForm({ ...checkoutForm, email: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-black"
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  Order Summary
+                </h3>
+                <div className="space-y-1 text-sm">
+                  {cart.map((item) => (
+                    <div key={item._id} className="flex justify-between">
+                      <span>
+                        {item.product.name} x{item.quantity}
+                      </span>
+                      <span>
+                        ${(item.product.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-gray-300 mt-2 pt-2 flex justify-between font-bold text-lg">
+                  <span>Total:</span>
+                  <span className="text-indigo-600">
+                    ${cartTotal.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                disabled={loading}
+                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center space-x-2"
+              >
+                <span>{loading ? "Processing..." : "Complete Purchase"}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
