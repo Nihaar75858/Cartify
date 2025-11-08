@@ -11,8 +11,8 @@ const Cartify = () => {
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutForm, setCheckoutForm] = useState({
-    name: '',
-    email: ''
+    name: "",
+    email: "",
   });
   const [showReceipt, setShowReceipt] = useState(false);
   const [receipt, setReceipt] = useState(null);
@@ -139,12 +139,16 @@ const Cartify = () => {
       if (!response.ok) throw new Error("Checkout failed");
 
       const data = await response.json();
+
+      setCart([]);
+      setCartTotal(0);
+
+      await fetchCart();
+      
       setReceipt(data);
       setShowCheckout(false);
       setShowCart(false);
       setShowReceipt(true);
-      setCart([]);
-      setCartTotal(0);
       setCheckoutForm({ name: "", email: "" });
       setError("");
     } catch (err) {
@@ -195,6 +199,20 @@ const Cartify = () => {
           />
         </div>
       </div>
+
+      {error && (
+        <div className="max-w-7xl mx-auto px-4 mt-4">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
+            <span>{error}</span>
+            <button
+              onClick={() => setError("")}
+              className="text-red-700 hover:text-red-900"
+            >
+              Ok
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Products Grid */}
       <main className="max-w-7xl mx-auto px-4 py-8 bg-red-500">
@@ -309,9 +327,7 @@ const Cartify = () => {
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-4">
                   <div className="flex items-center justify-between text-xl font-bold">
                     <span>Total:</span>
-                    <span className="text-black">
-                      ${cartTotal.toFixed(2)}
-                    </span>
+                    <span className="text-black">${cartTotal.toFixed(2)}</span>
                   </div>
                   <button
                     onClick={() => {
@@ -392,9 +408,7 @@ const Cartify = () => {
                 </div>
                 <div className="border-t border-gray-300 text-black mt-2 pt-2 flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span className="text-black">
-                    ${cartTotal.toFixed(2)}
-                  </span>
+                  <span className="text-black">${cartTotal.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -414,42 +428,63 @@ const Cartify = () => {
         <div className="fixed inset-0 bg-white z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Order Confirmed!
+              </h2>
               <p className="text-gray-600">Thank you for your purchase</p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg mb-6 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Order ID:</span>
-                <span className="font-mono font-semibold text-black">{receipt.orderId}</span>
+                <span className="font-mono font-semibold text-black">
+                  {receipt.orderId}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Date:</span>
-                <span className="font-semibold text-black">{new Date(receipt.timestamp).toLocaleString()}</span>
+                <span className="font-semibold text-black">
+                  {new Date(receipt.timestamp).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Customer:</span>
-                <span className="font-semibold text-black">{receipt.customerInfo.name}</span>
+                <span className="font-semibold text-black">
+                  {receipt.customerInfo.name}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Email:</span>
-                <span className="font-semibold text-black">{receipt.customerInfo.email}</span>
+                <span className="font-semibold text-black">
+                  {receipt.customerInfo.email}
+                </span>
               </div>
             </div>
 
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-2">Items Purchased:</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                Items Purchased:
+              </h3>
               <div className="space-y-2">
                 {receipt.items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between text-sm text-black">
-                    <span>{item.name} x{item.quantity}</span>
-                    <span className="font-semibold">${item.subtotal.toFixed(2)}</span>
+                  <div
+                    key={idx}
+                    className="flex justify-between text-sm text-black"
+                  >
+                    <span>
+                      {item.name} x{item.quantity}
+                    </span>
+                    <span className="font-semibold">
+                      ${item.subtotal.toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
               <div className="border-t border-gray-300 text-black mt-3 pt-3 flex justify-between font-bold text-lg">
                 <span>Total Paid:</span>
-                <span className="text-green-600">${receipt.total.toFixed(2)}</span>
+                <span className="text-green-600">
+                  ${receipt.total.toFixed(2)}
+                </span>
               </div>
             </div>
 

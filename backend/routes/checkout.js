@@ -51,7 +51,8 @@ router.post('/', async (req, res) => {
       items: order.items,
       total: order.total,
       timestamp: order.timestamp,
-      message: 'Order placed successfully!'
+      message: 'Order placed successfully!',
+      cartCleared: true
     });
 
   } catch (error) {
