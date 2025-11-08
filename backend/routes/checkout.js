@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
 
     await order.save();
 
-    const cart = await Cart.findOne({ userId: 'mock-user-123' });
+    const cart = await Cart.findOne({ userId: 'User-123' });
     if (cart) {
       cart.items = [];
       cart.total = 0;

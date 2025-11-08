@@ -14,6 +14,8 @@ const Cartify = () => {
     name: '',
     email: ''
   });
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receipt, setReceipt] = useState(null);
 
   // Fetch products from backend
   useEffect(() => {
@@ -137,8 +139,10 @@ const Cartify = () => {
       if (!response.ok) throw new Error("Checkout failed");
 
       const data = await response.json();
+      setReceipt(data);
       setShowCheckout(false);
       setShowCart(false);
+      setShowReceipt(true);
       setCart([]);
       setCartTotal(0);
       setCheckoutForm({ name: "", email: "" });
@@ -163,7 +167,7 @@ const Cartify = () => {
 
           <button
             onClick={() => setShowCart(true)}
-            className="relative px-4 py-8 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="relative px-4 py-8 text-white bg-gray-500 rounded-lg hover:bg-white hover:text-black transition-colors"
           >
             <p>Cart</p>
             {cartItemCount > 0 && (
@@ -208,7 +212,7 @@ const Cartify = () => {
                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">
+                  <h3 className="font-semibold text-gray-900 mb-1 text-2xl">
                     {product.name}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3">
@@ -216,13 +220,13 @@ const Cartify = () => {
                   </p>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-indigo-600">
+                    <span className="text-2xl font-bold text-black">
                       ${product.price.toFixed(2)}
                     </span>
                     <button
                       onClick={() => addToCart(product._id)}
                       disabled={loading}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                      className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50 flex items-center space-x-2"
                     >
                       <span>Add</span>
                     </button>
@@ -236,7 +240,7 @@ const Cartify = () => {
 
       {/* Cart Sidebar */}
       {showCart && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+        <div className="fixed inset-0 bg-neutral-900/70 z-50 flex justify-end">
           <div className="bg-white w-full max-w-md h-full overflow-y-auto shadow-xl">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
@@ -264,14 +268,14 @@ const Cartify = () => {
                         <h3 className="font-semibold text-gray-900 truncate">
                           {item.product.name}
                         </h3>
-                        <p className="text-indigo-600 font-semibold">
+                        <p className="text-black font-semibold">
                           ${item.product.price.toFixed(2)}
                         </p>
 
                         <div className="flex items-center space-x-2 mt-2">
                           <button
                             onClick={() => updateQuantity(item._id, -1)}
-                            className="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
+                            className="w-8 h-8 bg-white text-black border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
                           >
                             -
                           </button>
@@ -280,7 +284,7 @@ const Cartify = () => {
                           </span>
                           <button
                             onClick={() => updateQuantity(item._id, 1)}
-                            className="w-8 h-8 bg-white border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
+                            className="w-8 h-8 bg-white text-black border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
                           >
                             +
                           </button>
@@ -305,7 +309,7 @@ const Cartify = () => {
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-4">
                   <div className="flex items-center justify-between text-xl font-bold">
                     <span>Total:</span>
-                    <span className="text-indigo-600">
+                    <span className="text-black">
                       ${cartTotal.toFixed(2)}
                     </span>
                   </div>
@@ -314,7 +318,7 @@ const Cartify = () => {
                       setShowCart(false);
                       setShowCheckout(true);
                     }}
-                    className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                    className="w-full py-3 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
                   >
                     Proceed to Checkout
                   </button>
@@ -327,7 +331,7 @@ const Cartify = () => {
 
       {/* Checkout Modal */}
       {showCheckout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-neutral-900/70 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Checkout</h2>
@@ -351,7 +355,6 @@ const Cartify = () => {
                     setCheckoutForm({ ...checkoutForm, name: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-black"
-                  placeholder="John Doe"
                   required
                 />
               </div>
@@ -367,7 +370,6 @@ const Cartify = () => {
                     setCheckoutForm({ ...checkoutForm, email: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-black"
-                  placeholder="john@example.com"
                   required
                 />
               </div>
@@ -376,7 +378,7 @@ const Cartify = () => {
                 <h3 className="font-semibold text-gray-900 mb-2">
                   Order Summary
                 </h3>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm text-black">
                   {cart.map((item) => (
                     <div key={item._id} className="flex justify-between">
                       <span>
@@ -388,9 +390,9 @@ const Cartify = () => {
                     </div>
                   ))}
                 </div>
-                <div className="border-t border-gray-300 mt-2 pt-2 flex justify-between font-bold text-lg">
+                <div className="border-t border-gray-300 text-black mt-2 pt-2 flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span className="text-indigo-600">
+                  <span className="text-black">
                     ${cartTotal.toFixed(2)}
                   </span>
                 </div>
@@ -399,11 +401,64 @@ const Cartify = () => {
               <button
                 onClick={handleCheckout}
                 disabled={loading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-yellow-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center space-x-2"
               >
                 <span>{loading ? "Processing..." : "Complete Purchase"}</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showReceipt && receipt && (
+        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h2>
+              <p className="text-gray-600">Thank you for your purchase</p>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg mb-6 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Order ID:</span>
+                <span className="font-mono font-semibold text-black">{receipt.orderId}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Date:</span>
+                <span className="font-semibold text-black">{new Date(receipt.timestamp).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Customer:</span>
+                <span className="font-semibold text-black">{receipt.customerInfo.name}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Email:</span>
+                <span className="font-semibold text-black">{receipt.customerInfo.email}</span>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-2">Items Purchased:</h3>
+              <div className="space-y-2">
+                {receipt.items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-sm text-black">
+                    <span>{item.name} x{item.quantity}</span>
+                    <span className="font-semibold">${item.subtotal.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-gray-300 text-black mt-3 pt-3 flex justify-between font-bold text-lg">
+                <span>Total Paid:</span>
+                <span className="text-green-600">${receipt.total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowReceipt(false)}
+              className="w-full py-3 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+            >
+              Continue Shopping
+            </button>
           </div>
         </div>
       )}
