@@ -18,9 +18,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Cartify',
 
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
+const checkoutRoutes = require('./routes/checkout');
 
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
@@ -31,6 +33,7 @@ app.get('/', (req, res) => {
       addToCart: 'POST /api/cart',
       updateCart: 'PUT /api/cart/:id',
       removeFromCart: 'DELETE /api/cart/:id',
+      checkout: 'POST /api/checkout'
     }
   });
 });
