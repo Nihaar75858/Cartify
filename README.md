@@ -2,8 +2,6 @@
 
 A modern, full-stack shopping cart application built with React, Node.js/Express, and MongoDB. Features real-time cart management, mock checkout process, and responsive design.
 
-![Cartify Demo](https://via.placeholder.com/800x400?text=Vibe+Commerce+Demo)
-
 ## Features
 
 ### Frontend (React)
