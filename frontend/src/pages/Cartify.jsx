@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Cartify = () => {
   const [products, setProducts] = useState([]);
@@ -144,7 +144,7 @@ const Cartify = () => {
       setCartTotal(0);
 
       await fetchCart();
-      
+
       setReceipt(data);
       setShowCheckout(false);
       setShowCart(false);
@@ -187,7 +187,8 @@ const Cartify = () => {
         <div className="text-black flex-1 text-4xl">
           <h1 className="mb-10">Cartify</h1>
           <p className="text-xl text-gray-700">
-            Shop and get your favourite items.
+            The Best items for the Best prices. <br></br>
+            Shop for your favourites. 
           </p>
         </div>
 
@@ -325,7 +326,7 @@ const Cartify = () => {
                 </div>
 
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-4">
-                  <div className="flex items-center justify-between text-xl font-bold">
+                  <div className="flex items-center justify-between text-xl font-bold text-black">
                     <span>Total:</span>
                     <span className="text-black">${cartTotal.toFixed(2)}</span>
                   </div>
